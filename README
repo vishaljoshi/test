@@ -1,4 +1,14 @@
 This is your new Play application
 =====================================
 
-This file will be packaged with your application, when using `play dist`.
+installation details:
+using play 2.2.2 built with Scala 2.10.3 (running Java 1.7.0_67)
+
+For running the app use below commands:
+ 1. play 
+ 2. clean
+ 3. eclipse ---- if you want to import it to eclipse IDE
+ 4. ~run  to start 
+ 
+Mongo DB details available in :
+ test/conf/applicationContext.xml file.
