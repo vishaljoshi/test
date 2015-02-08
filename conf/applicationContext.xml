@@ -9,16 +9,16 @@
 	<context:component-scan base-package="controllers,product.*" />
 	
 	
-	<mongo:mongo host="localhost" port="27017" />
+	<mongo:mongo host="ds048537.mongolab.com" port="48537" />
 	<bean id="userCredentials" class="org.springframework.data.authentication.UserCredentials">
-		<constructor-arg name="username" value="test1" />
-		<constructor-arg name="password" value="test1" />
+		<constructor-arg name="username" value="test" />
+		<constructor-arg name="password" value="test" />
 	</bean>
 
 
 	<bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
 		<constructor-arg ref="mongo" />
-		<constructor-arg name="databaseName" value="mydb" />
+		<constructor-arg name="databaseName" value="redmart" />
 		<constructor-arg name="userCredentials" ref="userCredentials" />
 	</bean>
 

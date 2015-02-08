@@ -98,7 +98,9 @@ var loadProduct =function (searchObj, id) {
 						document.getElementById("title").value = res.title;
 						document.getElementById("pricing.price").value = res.pricing.price;
 						document.getElementById("cost").value = res.pricing.cost;
-					} else {
+					} else if(res.errorCode==="110") {
+						isloading(searchObj.id, false, "Product "+id+" could not be found");
+					}else {
 						isloading(searchObj.id, false, res.errorMsg);
 					}
 
@@ -131,9 +133,9 @@ var validate =function (element) {
 		if (!pricePatt.test(element.value)) {
 			console.log("PRICE bad");
 			_ret = "incorrect price"
-		} else if (element.value > document.getElementById("cost").value) {
+		} else if (element.value >= document.getElementById("cost").value) {
 
-			_ret = "price cannot be greater than cost";
+			_ret = "price cannot be equal or greater than cost";
 
 		}
 
@@ -253,7 +255,9 @@ autoSuggest.prototype.fireSuggest = function() {
 			if (res != null && !res.errorMsg) {
 				
 				autoSuggest.prototype.showSuggest.call(_t, res);
-			} else {
+			} else if(res.errorCode==="110") {
+				isloading(searchObj.id, false, "Product "+this.searchBoxObj.value+" could not be found");
+			}else {
 				isloading(this.searchBoxObj.id, false, res.errorMsg);
 			}
 
