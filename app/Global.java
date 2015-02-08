@@ -1,3 +1,15 @@
+/**
+ * Project:test
+ * File:Global.java
+ * 
+ * History:
+ * ----------------------------------------------------------------------------------------------------
+ * Author                   | Date                |        Description                                |
+ * ----------------------------------------------------------------------------------------------------
+ *  Vishal Joshi            |Feb 06, 2015         | Creation                                          |
+ * ----------------------------------------------------------------------------------------------------
+ */
+
 import java.lang.reflect.Method;
 
 import org.springframework.context.ApplicationContext;
@@ -30,6 +42,10 @@ public class Global extends GlobalSettings {
 
     @Override
     public void onStart(Application app) {
+        
+        /**
+         * Loading Spring config
+         */
         Configuration cfg = Play.application().configuration();
         String springConfigLoc = cfg.getString("spring.context.location");
         Logger.info("Spring Configuration location :  " + springConfigLoc);
@@ -55,6 +71,11 @@ public class Global extends GlobalSettings {
         this.applicationContext = applicationContext;
     }
 
+    /**
+     * handling global exception 
+     * 
+     */
+    
     @Override
     public Action<?> onRequest(final Request req, Method actionMethod) {
         return new Action.Simple() {

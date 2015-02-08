@@ -1,3 +1,14 @@
+/**
+ * Project:test
+ * File:product.dao.DaoImpl.java
+ * 
+ * History:
+ * ----------------------------------------------------------------------------------------------------
+ * Author                   | Date                |        Description                                |
+ * ----------------------------------------------------------------------------------------------------
+ *  Vishal Joshi            |Feb 06, 2015         | Creation                                          |
+ * ----------------------------------------------------------------------------------------------------
+ */
 package product.dao;
 
 import static org.springframework.data.mongodb.core.query.Criteria.where;
@@ -20,26 +31,38 @@ public class DaoImpl implements Dao{
     @Autowired
     private MongoTemplate mongoTemplate;
     
+    /**
+     * searching based on product Id
+     * 
+     */
     @Override
     public List<Product> findProduct(int id){
         
         BasicQuery searchQuery = new BasicQuery("{$where:'/"+id+"/.test(this.id)'}");
         searchQuery.limit(10);
-        System.out.println("id="+id);
+        
         List<Product> result = mongoTemplate.find(searchQuery, Product.class);
-        System.out.println("result"+result.size());
-        System.out.println("result"+result);
+        
          return result;       
     }
+    
+    /**
+     * get the product  based on product Id
+     * 
+     */
     public Product getProduct(int id){
         BasicQuery searchQuery = new BasicQuery("{id:"+id+"}");
-        System.out.println("id="+id);
+       
         Product result = mongoTemplate.findOne(searchQuery, Product.class);
        
-        System.out.println("result"+result);
+       
          return result;
     }
     
+    /**
+     * updating product fields based on product Id
+     * 
+     */
     @Override
     public boolean updateProduct(int id,String field,final Double  doublevalue,final String  Stringvalue ){
         

@@ -1,3 +1,14 @@
+/**
+ * Project:test
+ * File:product.controller.ProductController.java
+ * 
+ * History:
+ * ----------------------------------------------------------------------------------------------------
+ * Author                   | Date                |        Description                                |
+ * ----------------------------------------------------------------------------------------------------
+ *  Vishal Joshi            |Feb 06, 2015         | Creation                                          |
+ * ----------------------------------------------------------------------------------------------------
+ */
 package product.controller;
 
 import java.util.List;
@@ -5,17 +16,21 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import play.libs.Json;
 import play.libs.F.Function;
 import play.libs.F.Promise;
 import play.mvc.Controller;
 import play.mvc.Result;
-import product.dto.Product;
 import product.dto.Error;
+import product.dto.Product;
 import product.service.ProductService;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+
+/**
+ * @author Vishal Joshi
+ *
+ */
 @org.springframework.stereotype.Controller
 public class ProductController extends Controller {
 
@@ -23,6 +38,11 @@ public class ProductController extends Controller {
     @Autowired
     private ProductService productService = null;
     
+    /**
+     * Description: searching the product based on partial Id's
+     * @param id
+     * @return
+     */
     public   Promise<Result> findProduct(Integer id) {
         Promise<Result> resultPromise = null;  
         resultPromise = productService.findProduct(id).map(new Function<List<Product>, Result>() {
@@ -44,6 +64,12 @@ public class ProductController extends Controller {
         return resultPromise;
     }
 
+    
+    /**
+     * Description: this method gets the product details based on product id
+     * @param id
+     * @return
+     */
     public  Promise<Result> getProduct(int id) {
         Promise<Result> resultPromise = null;  
         resultPromise = productService.getProduct(id).map(new Function<Product, Result>() {
@@ -64,7 +90,13 @@ public class ProductController extends Controller {
         });
         return resultPromise;
     }
+    
+    
 
+    /**
+     * Description: updates the product fields , its a post request
+     * @return
+     */
     public  Promise<Result> updateProduct() {
         final Map<String, String[]> values = request().body().asFormUrlEncoded();
         final int id = Integer.parseInt(values.get("id")[0]);

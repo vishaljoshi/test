@@ -120,6 +120,7 @@ body {
     overflow: hidden;
     margin-top: -10px;
     display:none;
+    float:right;
     background-size: 20px 20px;
     background-repeat: no-repeat;
     background-position: center center;

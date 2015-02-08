@@ -1,3 +1,14 @@
+/**
+ * Project:test
+ * File:product.service.ProductServiceImpl.java
+ * 
+ * History:
+ * ----------------------------------------------------------------------------------------------------
+ * Author                   | Date                |        Description                                |
+ * ----------------------------------------------------------------------------------------------------
+ *  Vishal Joshi            |Feb 06, 2015         | Creation                                          |
+ * ----------------------------------------------------------------------------------------------------
+ */
 package product.service;
 
 import java.util.List;
@@ -15,6 +26,8 @@ public class ProductServiceImpl implements ProductService {
     
     @Autowired
     private Dao dao;
+    
+  
     @Override
     public Promise<List<Product>> findProduct(final int id) {
        
@@ -28,6 +41,7 @@ public class ProductServiceImpl implements ProductService {
         return promiseResult;
     }
 
+    
     @Override
     public Promise<Product> getProduct(final int id) {
 
@@ -40,16 +54,23 @@ public class ProductServiceImpl implements ProductService {
         return promiseResult;
     }
 
+   
+    /**
+     * checking for right fields to update
+     * 
+     */
     @Override
     public  Promise<Boolean> updateProduct(final int id,final String field,final String  value ){
         Promise<Boolean> promiseResult = Promise.promise(new Function0<Boolean>() {
             @Override
             public Boolean apply() {
                 try{
-                if("price".equals(field)){                    
+                if("pricing.price".equals(field)){                    
                     return   dao.updateProduct(id, field, Double.parseDouble(value),null);
-                }else{
+                }else if("title".equals(field)){
                     return   dao.updateProduct(id, field, null,value);
+                }else{
+                    return false;
                 }
                 }catch(Exception e){
                     e.printStackTrace();

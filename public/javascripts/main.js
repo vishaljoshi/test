@@ -1,16 +1,16 @@
-
 //var productModule = function(doc,baseUrl){
 /**
  * Globale Error constants
-*/
+ */
 var error = {};
 error.connecting = "unable to connect";
 error.invalid = "invalid response";
 error.updated = "sucessfully updated";
+error.notUpdated = " is not updated";
 
 /**
- * Handling the spinner and error message
- * data loads quickly hence spinner is not vissble :)
+ * Handling the spinner and error message data loads quickly hence spinner is
+ * not vissble :)
  */
 var isloading = function(id, flag, errorMsg) {
 	if (flag) {
@@ -25,10 +25,10 @@ var isloading = function(id, flag, errorMsg) {
 /**
  * Handles the updating of price and title
  */
-var update = function (e) {
+function update(event) {
 
-	e = window.event || e;
-	var targetElement = e.target;
+	var e = event || window.event;
+	var targetElement = e.target || e.srcElement;
 	// only if hit entere key
 	if (e.keyCode === 13) {
 		var elementId = targetElement.id;
@@ -48,11 +48,11 @@ var update = function (e) {
 			httpService(req, 'POST', param, null, function(status, response) {
 				if (response && status === 200) {
 					var res = JSON.parse(response);
-					if (!res.errorMsg) {
+					if (!res.errorMsg || res === true) {
 
 						isloading(elementId, false, error.updated);
 					} else {
-						isloading(elementId, false, res.errorMsg);
+						isloading(elementId, false, error.notUpdated);
 					}
 
 				} else {
@@ -73,7 +73,7 @@ var update = function (e) {
 /**
  * loading the product after selecting the product id
  */
-var loadProduct =function (searchObj, id) {
+var loadProduct = function(searchObj, id) {
 	// need to clean up the form data before loading new data.
 	document.getElementById("productId").value = null;
 	document.getElementById("title").value = null;
@@ -82,35 +82,37 @@ var loadProduct =function (searchObj, id) {
 	isloading(document.getElementById("title").id, false, '');
 	isloading(document.getElementById("pricing.price").id, false, '');
 	var req = baseUrl + "/product/" + id;
+	if (id) {
+		isloading(searchObj.id, true, '');
+		httpService(
+				req,
+				'GET',
+				null,
+				null,
+				function(status, response) {
+					if (response != null && status === 200) {
+						var res = JSON.parse(response);
+						if (res != null && !res.errorMsg) {
+							isloading(searchObj.id, false, '');
+							document.getElementById("productId").value = res.id;
+							document.getElementById("title").value = res.title;
+							document.getElementById("pricing.price").value = res.pricing.price;
+							document.getElementById("cost").value = res.pricing.cost;
+						} else if (res.errorCode === "110") {
+							isloading(searchObj.id, false, "Product " + id
+									+ " could not be found");
+						} else {
+							isloading(searchObj.id, false, res.errorMsg);
+						}
 
-	isloading(searchObj.id, true, '');
-	httpService(
-			req,
-			'GET',
-			null,
-			null,
-			function(status, response) {
-				if (response != null && status === 200) {
-					var res = JSON.parse(response);
-					if (res != null && !res.errorMsg) {
-						isloading(searchObj.id, false, '');
-						document.getElementById("productId").value = res.id;
-						document.getElementById("title").value = res.title;
-						document.getElementById("pricing.price").value = res.pricing.price;
-						document.getElementById("cost").value = res.pricing.cost;
-					} else if(res.errorCode==="110") {
-						isloading(searchObj.id, false, "Product "+id+" could not be found");
-					}else {
-						isloading(searchObj.id, false, res.errorMsg);
+					} else {
+						isloading(searchObj.id, false, error.invalid);
 					}
-
-				} else {
-					isloading(searchObj.id, false, error.invalid);
-				}
-			}, function(status) {
-				// error handling
-				isloading(searchObj.id, false, error.connecting);
-			});
+				}, function(status) {
+					// error handling
+					isloading(searchObj.id, false, error.connecting);
+				});
+	}
 
 }
 
@@ -118,7 +120,7 @@ var loadProduct =function (searchObj, id) {
  * validation before updating the product
  * 
  */
-var validate =function (element) {
+var validate = function(element) {
 	_ret = null;
 	if (element.id === 'title') {
 		var titlePatt = new RegExp('(?=.*[a-zA-Z])[a-zA-Z0-9]+$');
@@ -147,7 +149,7 @@ var validate =function (element) {
  * Handles all the auto complete functionality
  * 
  */
-var autoSuggest =function (searchBoxObj, suggestBoxObj, urlForSuggest) {
+var autoSuggest = function(searchBoxObj, suggestBoxObj, urlForSuggest) {
 	this.cur = -1;
 	// alert(searchBoxObj.name);
 	this.urlForSuggest = urlForSuggest;
@@ -184,7 +186,7 @@ autoSuggest.prototype.keyDown = function(e) {
 				this.autoSuggest.searchBoxObj.value);
 		break;
 	}
-  };
+};
 
 autoSuggest.prototype.moveDown = function() {
 
@@ -226,38 +228,39 @@ autoSuggest.prototype.moveUp = function() {
 autoSuggest.prototype.keyUp = function(e) {
 	e = e || window.event;
 	var iKeyCode = e.keyCode;
-	
+
 	if (iKeyCode == 8 || iKeyCode == 46) {
-		// for backspace and delete	
-	    this.autoSuggest.fireSuggest();
+		// for backspace and delete
+		this.autoSuggest.fireSuggest();
 	} else if (iKeyCode < 32 || (iKeyCode >= 33 && iKeyCode <= 46)
 			|| (iKeyCode >= 112 && iKeyCode <= 123)) { // ignore
-	        // do nothing for special char . need to add more keys!!
+		// do nothing for special char . need to add more keys!!
 	} else {
 		this.autoSuggest.fireSuggest();
 	}
 };
 
 /**
- * handles getting the  data for auto complete
+ * handles getting the data for auto complete
  * 
  */
 autoSuggest.prototype.fireSuggest = function() {
 	while (this.suggestBoxObj.hasChildNodes()) {
 		this.suggestBoxObj.removeChild(this.suggestBoxObj.firstChild);
 	}
-	this.suggestBoxObj.style.display = "none";	
+	this.suggestBoxObj.style.display = "none";
 	var req = this.urlForSuggest + "?id=" + this.searchBoxObj.value;
 	var _t = this;
-	httpService(req,'GET',	null,null,function(status, response) {
+	httpService(req, 'GET', null, null, function(status, response) {
 		if (response != null && status === 200) {
 			var res = JSON.parse(response);
 			if (res != null && !res.errorMsg) {
-				
+
 				autoSuggest.prototype.showSuggest.call(_t, res);
-			} else if(res.errorCode==="110") {
-				isloading(searchObj.id, false, "Product "+this.searchBoxObj.value+" could not be found");
-			}else {
+			} else if (res.errorCode === "110") {
+				isloading(searchObj.id, false, "Product "
+						+ this.searchBoxObj.value + " could not be found");
+			} else {
 				isloading(this.searchBoxObj.id, false, res.errorMsg);
 			}
 
@@ -316,15 +319,14 @@ autoSuggest.prototype.showSuggest = function(data) {
 	}
 };
 
-
 /**
- *HTTP service to handle all the ajax calls 
+ * HTTP service to handle all the ajax calls
  * 
  * 
  */
 var httpService = function(url, method, param, headers, sucessCallBack,
 		errorCallBack) {
-	var ajax =  new XMLHttpRequest();
+	var ajax = new XMLHttpRequest();
 	var _send = null;
 	var setHeaders = function(headers) {
 		if (headers) {
@@ -355,7 +357,8 @@ var httpService = function(url, method, param, headers, sucessCallBack,
 	}
 
 	if ("GET" === method) {
-		ajax.open('GET', url + (param==null? '':'?'+paramToString(param)), false);
+		ajax.open('GET', url
+				+ (param == null ? '' : '?' + paramToString(param)), false);
 	} else {
 		ajax.open('POST', url, false);
 		_send = paramToString(param);
